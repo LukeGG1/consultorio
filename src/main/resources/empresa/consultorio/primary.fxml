@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
+
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="460.0" prefWidth="780.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="empresa.consultorio.PrimaryController">
+   <right>
+      <VBox prefWidth="332.0" styleClass="vboxRight" stylesheets="@styles.css" BorderPane.alignment="CENTER">
+         <children>
+            <VBox alignment="BOTTOM_CENTER" prefHeight="128.0" prefWidth="332.0">
+               <children>
+                  <Text fill="#ed6637" strokeType="OUTSIDE" strokeWidth="0.0" text="Consultorio" wrappingWidth="256.5441596508026">
+                     <font>
+                        <Font size="36.0" />
+                     </font>
+                  </Text>
+               </children>
+               <opaqueInsets>
+                  <Insets />
+               </opaqueInsets>
+            </VBox>
+            <HBox alignment="CENTER" prefHeight="58.0" prefWidth="332.0">
+               <children>
+                  <TextField fx:id="txtUsuario" prefHeight="38.0" prefWidth="267.0" promptText="Usuario" style="-fx-background-radius: 50; -fx-border-radius: 50;">
+                     <font>
+                        <Font size="14.0" />
+                     </font>
+                     <opaqueInsets>
+                        <Insets />
+                     </opaqueInsets>
+                     <HBox.margin>
+                        <Insets top="20.0" />
+                     </HBox.margin>
+                  </TextField>
+               </children>
+            </HBox>
+            <HBox alignment="CENTER" prefHeight="58.0" prefWidth="332.0">
+               <children>
+                  <TextField fx:id="txtContra" prefHeight="38.0" prefWidth="267.0" promptText="Contraseña" style="-fx-background-radius: 50; -fx-border-radius: 50;">
+                     <font>
+                        <Font size="14.0" />
+                     </font>
+                     <HBox.margin>
+                        <Insets top="20.0" />
+                     </HBox.margin>
+                  </TextField>
+               </children>
+            </HBox>
+            <HBox alignment="CENTER" prefHeight="58.0" prefWidth="332.0">
+               <children>
+                  <HBox alignment="CENTER" prefHeight="58.0" prefWidth="262.0">
+                     <children>
+                        <Button fx:id="btnIniciar" mnemonicParsing="false" onAction="#iniciar" prefHeight="38.0" prefWidth="267.0" style="-fx-background-radius: 50; -fx-border-radius: 50; -fx-background-color: #ed6637;" text="Iniciar" textFill="WHITE">
+                           <font>
+                              <Font name="Calibri Bold" size="18.0" />
+                           </font>
+                           <HBox.margin>
+                              <Insets top="20.0" />
+                           </HBox.margin>
+                        </Button>
+                     </children>
+                  </HBox>
+               </children>
+            </HBox>
+         </children>
+         <opaqueInsets>
+            <Insets />
+         </opaqueInsets>
+      </VBox>
+   </right>
+   <center>
+      <VBox prefWidth="449.0" styleClass="vbox_background_center" stylesheets="@styles.css" BorderPane.alignment="CENTER">
+         <children>
+            <HBox alignment="CENTER_RIGHT" prefHeight="100.0" prefWidth="200.0">
+               <children>
+                  <HBox alignment="CENTER_RIGHT" prefHeight="99.0" prefWidth="226.0">
+                     <children>
+                        <Button mnemonicParsing="false" prefHeight="30.0" prefWidth="122.0" style="-fx-background-radius: 50; -fx-background-color: transparent;" text="Iniciar Sesion" textFill="#150101">
+                           <font>
+                              <Font name="System Bold" size="16.0" />
+                           </font>
+                        </Button>
+                        <Button mnemonicParsing="false" prefHeight="30.0" prefWidth="105.0" style="-fx-background-radius: 50; -fx-background-color: #ed6637;" text="Registrarse" textFill="#fcf9f9">
+                           <font>
+                              <Font name="System Bold" size="14.0" />
+                           </font>
+                        </Button>
+                     </children>
+                  </HBox>
+               </children>
+               <padding>
+                  <Insets bottom="20.0" left="20.0" right="10.0" top="20.0" />
+               </padding>
+            </HBox>
+            <HBox prefHeight="361.0" prefWidth="448.0" />
+         </children>
+      </VBox>
+   </center>
+</BorderPane>

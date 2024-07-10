@@ -1,0 +1,11 @@
+.vbox_background_center{
+    -fx-background-image:url("bgimage.jpg");
+    -fx-background-repeat: no-repeat;
+    -fx-background-size: cover;
+}
+
+.vboxRight{
+    -fx-background-image:url("rigthimage.jpg");
+    -fx-background-repeat: no-repeat;
+    -fx-background-size: cover;
+}
