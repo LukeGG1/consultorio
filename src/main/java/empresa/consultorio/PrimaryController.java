@@ -43,7 +43,8 @@ public class PrimaryController {
 
                     // Cargar y mostrar la nueva escena
                     btnIniciar.getScene().getWindow().hide();
-                    Parent root = FXMLLoader.load(getClass().getResource("secondary.fxml"));
+                    
+                    Parent root = FXMLLoader.load(getClass().getResource("/empresa/consultorio/secondary"));
                     Scene scene = new Scene(root);
                     Stage stage = new Stage();
                     stage.setScene(scene);

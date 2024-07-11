@@ -6,19 +6,35 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
+import javafx.stage.StageStyle;
+
 import java.io.IOException;
 
 /**
  * JavaFX App
  */
 public class App extends Application {
-
+    double x,y = 0;
     private static Scene scene;
 
     @Override
     public void start(Stage stage) throws IOException {
-        scene = new Scene(loadFXML("primary"), 640, 480);
-        stage.setScene(scene);
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/empresa/consultorio/primary.fxml"));
+        Parent root = loader.load();
+        stage.initStyle(StageStyle.UNDECORATED);
+        
+        root.setOnMousePressed(event ->{
+            x = event.getSceneX();
+            y = event.getSceneY();
+        });
+        
+        root.setOnMouseDragged(event -> {
+            stage.setX(event.getScreenX() - x);
+            stage.setY(event.getScreenY() - y);
+        });
+        
+        stage.setScene(new Scene(root,800,500));
+        
         stage.show();
     }
 
@@ -32,7 +48,7 @@ public class App extends Application {
     }
 
     public static void main(String[] args) {
-        launch();
+        launch(args);
     }
 
 }
