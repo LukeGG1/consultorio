@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.net.URL?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+
+<AnchorPane id="AnchorPane" prefHeight="400.0" prefWidth="600.0" styleClass="mainFxmlClass" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/21" fx:controller="empresa.consultorio.CrearInformeController">
+    <stylesheets>
+        <URL value="@/empresa/consultorio/styles.css" />
+    </stylesheets>
+   <children>
+      <TextField layoutX="81.0" layoutY="29.0" promptText="Ingrese el paciente" />
+      <Label layoutX="81.0" layoutY="79.0" prefHeight="18.0" prefWidth="101.0" text="Motivo de consulta" />
+   </children>
+</AnchorPane>
