@@ -19,7 +19,7 @@ public class App extends Application {
 
     @Override
     public void start(Stage stage) throws IOException {
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/empresa/consultorio/primary.fxml"));
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/empresa/consultorio/secondary.fxml"));
         Parent root = loader.load();
         stage.initStyle(StageStyle.UNDECORATED);
         

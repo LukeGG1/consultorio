@@ -8,4 +8,5 @@ module empresa.consultorio {
     opens empresa.consultorio to javafx.fxml;
     exports empresa.consultorio;
     exports clases;
+    requires com.jfoenix;
 }

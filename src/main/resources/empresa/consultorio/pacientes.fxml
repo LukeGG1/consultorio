@@ -1,14 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
-<?import java.net.*?>
-<?import java.util.*?>
-<?import javafx.scene.*?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
 
-<AnchorPane id="AnchorPane" prefHeight="400.0" prefWidth="600.0" styleClass="mainFxmlClass" xmlns:fx="http://javafx.com/fxml/1" fx:controller="empresa.consultorio.PacientesController">
-    <stylesheets>
-        <URL value="@/empresa/consultorio/styles.css"/>
-    </stylesheets>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="476.0" prefWidth="694.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <Label layoutX="20.0" layoutY="25.0" text="Nombre" />
+      <TextField fx:id="txtCorreo" layoutX="84.0" layoutY="145.0" prefHeight="26.0" prefWidth="270.0" />
+      <Label layoutX="20.0" layoutY="92.0" text="Apellido" />
+      <TextField fx:id="txtTelefono" layoutX="84.0" layoutY="200.0" prefHeight="26.0" prefWidth="270.0" />
+      <Label layoutX="23.0" layoutY="150.0" text="Correo" />
+      <TextField fx:id="txtNombre" alignment="TOP_LEFT" layoutX="85.0" layoutY="20.0" prefHeight="26.0" prefWidth="270.0" />
+      <Label layoutX="19.0" layoutY="204.0" text="Telefono" />
+      <TextField fx:id="txtApellido" alignment="TOP_LEFT" layoutX="85.0" layoutY="87.0" prefHeight="26.0" prefWidth="270.0" />
+      <TextField fx:id="txtSexo" layoutX="84.0" layoutY="264.0" />
+      <TextField fx:id="txtEdad" layoutX="85.0" layoutY="327.0" />
+      <Label layoutX="27.0" layoutY="268.0" text="Sexo" />
+      <Label layoutX="28.0" layoutY="340.0" text="Edad" />
+      <Label layoutX="28.0" layoutY="414.0" text="Alergias" />
+      <TextField fx:id="txtAlergias" layoutX="85.0" layoutY="410.0" />
+      <Label layoutX="307.0" layoutY="414.0" text="Cirugias" />
+      <TextField fx:id="txtCirugias" layoutX="382.0" layoutY="410.0" />
+      <Button layoutX="517.0" layoutY="43.0" mnemonicParsing="false" text="Añadir" />
+   </children>
 </AnchorPane>
