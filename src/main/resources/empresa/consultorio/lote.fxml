@@ -22,6 +22,11 @@
                   <Font size="20.0" />
                </font>
             </Label>
+            <TextField fx:id="txtNom" promptText="Ingrese el nombre del producto">
+               <VBox.margin>
+                  <Insets left="90.0" right="90.0" />
+               </VBox.margin>
+            </TextField>
             <Label text="Fecha Lote">
                <font>
                   <Font size="16.0" />

@@ -93,7 +93,7 @@ public class lote extends conexion implements sentencias {
         String sql = "INSERT INTO lote (fecha_lote, fecha_fabricacion, fecha_vencimiento, costo_lote, cantidad, producto_id_producto) VALUES (?, ?, ?, ?, ?, ?)";
 
         try (Connection con = getCon();
-             PreparedStatement stm = con.prepareStatement(sql)) {
+            PreparedStatement stm = con.prepareStatement(sql)) {
 
             stm.setString(1, this.fechaLote);
             stm.setString(2, this.fechaFabricacion);

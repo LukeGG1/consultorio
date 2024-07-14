@@ -4,6 +4,7 @@
  */
 package empresa.consultorio;
 
+import modelos.producto;
 import com.jfoenix.controls.JFXButton;
 import java.io.File;
 import java.io.IOException;

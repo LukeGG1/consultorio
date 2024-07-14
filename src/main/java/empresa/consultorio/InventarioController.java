@@ -21,6 +21,10 @@ import javafx.scene.control.TableView;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
 
+
+// Referencia al escenario principal
+    
+
 /**
  * FXML Controller class
  *
@@ -40,6 +44,14 @@ public class InventarioController implements Initializable {
     private TableColumn<?, ?> colVencimiento;
     @FXML
     private Button btnAñadir;
+    
+    
+    private Stage stage;
+
+    // Método para establecer el escenario
+    public void setStage(Stage stage) {
+        this.stage = stage;
+    }
 
     /**
      * Initializes the controller class.

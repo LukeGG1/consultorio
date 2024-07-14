@@ -1,13 +1,16 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/javafx/FXMLController.java to edit this template
- */
 package empresa.consultorio;
 
 import modelos.lote;
 import java.net.URL;
+import java.sql.Connection;
+import java.sql.DriverManager;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.List;
 import java.util.ResourceBundle;
+import java.util.stream.Collectors;
+import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -16,6 +19,7 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.TextField;
+import org.controlsfx.control.textfield.TextFields;
 
 /**
  * FXML Controller class
@@ -36,70 +40,84 @@ public class LoteController implements Initializable {
     private TextField txtCosto;
     @FXML
     private TextField txtCantidad;
+    @FXML
+    private TextField txtNom;
     
-    lote l = new lote();
-    ObservableList<lote> registros;
-    ObservableList<lote> registrosFiltrados;
-    boolean modificar = false;
+    private lote l = new lote();
+    private ObservableList<String> productoList;
+    private boolean modificar = false;
 
-    
-
-    /**
-     * Initializes the controller class.
-     */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        // TODO
-    }    
+        productoList = FXCollections.observableArrayList();
+        cargarProductos();
+        configurarAutocompletado(txtNom, productoList);
+    }
 
     @FXML
     private void guardar(ActionEvent event) {
-        String fechaLoteTexto = txtFechaLote.getValue().toString(); 
+        String fechaLoteTexto = txtFechaLote.getValue().toString();
         String fechaFabricacionTexto = txtFechaFabricacion.getValue().toString();
         String fechaVencimientoTexto = txtFechaVencimiento.getValue().toString();
         int costo = Integer.parseInt(txtCosto.getText());
         int cantidad = Integer.parseInt(txtCantidad.getText());
-        
+
         l.setFechaLote(fechaLoteTexto);
         l.setFechaFabricacion(fechaFabricacionTexto);
         l.setFechaVencimiento(fechaVencimientoTexto);
         l.setCostoLote(costo);
         l.setCantidad(cantidad);
-       
-        if(modificar){
-            if(l.modificar()){
-                Alert alerta = new Alert(Alert.AlertType.INFORMATION);
-                alerta.setTitle("El sistema comunica:");
-                alerta.setHeaderText(null);
-                alerta.setContentText("Modificado correctamente");
-                alerta.show();
-            }else {
-                Alert alerta = new Alert(Alert.AlertType.ERROR);
-                alerta.setTitle("Els sistema comunica:");
-                alerta.setHeaderText(null);
-                alerta.setContentText("Registro no modificado.");
-                alerta.show();
+
+        if (modificar) {
+            if (l.modificar()) {
+                mostrarAlerta(Alert.AlertType.INFORMATION, "El sistema comunica:", "Modificado correctamente");
+            } else {
+                mostrarAlerta(Alert.AlertType.ERROR, "El sistema comunica:", "Registro no modificado.");
             }
             modificar = false;
-            
-        }else{
+        } else {
             if (l.insertar()) {
-            Alert alerta = new Alert(Alert.AlertType.CONFIRMATION);
-            alerta.setTitle("El sistema comunica:");
-            alerta.setHeaderText(null);
-            alerta.setContentText("Insertado correctamente");
-            alerta.show();
-            }else{
-            Alert alerta = new Alert(Alert.AlertType.ERROR);
-            alerta.setTitle("Els sistema comunica:");
-            alerta.setHeaderText(null);
-            alerta.setContentText("No se pudo insertar");
-            alerta.show();
-            
+                mostrarAlerta(Alert.AlertType.CONFIRMATION, "El sistema comunica:", "Insertado correctamente");
+            } else {
+                mostrarAlerta(Alert.AlertType.ERROR, "El sistema comunica:", "No se pudo insertar");
+            }
         }
-        }
-       
-        
     }
-    
+
+    private void configurarAutocompletado(TextField textField, ObservableList<String> itemList) {
+        TextFields.bindAutoCompletion(textField, param -> {
+            List<String> filteredList = itemList.stream()
+                    .filter(item -> item.toLowerCase().contains(param.getUserText().toLowerCase()))
+                    .collect(Collectors.toList());
+            return filteredList;
+        });
+    }
+
+    private void cargarProductos() {
+        cargarItems("producto", productoList);
+    }
+
+    private void cargarItems(String itemName, ObservableList<String> itemList) {
+        String sql = "SELECT nombre FROM " + itemName;
+        try (Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/consultorio", "root", "");
+             PreparedStatement stm = con.prepareStatement(sql);
+             ResultSet rs = stm.executeQuery()) {
+
+            while (rs.next()) {
+                itemList.add(rs.getString("nombre"));
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    private void mostrarAlerta(Alert.AlertType tipo, String titulo, String contenido) {
+        Alert alerta = new Alert(tipo);
+        alerta.setTitle(titulo);
+        alerta.setHeaderText(null);
+        alerta.setContentText(contenido);
+        alerta.show();
+    }
 }
+    
+
