@@ -4,10 +4,17 @@
  */
 package clases;
 
+import java.util.ArrayList;
+
 /**
  *
  * @author Milagros Taboada
  */
 public interface sentencias {
+    public boolean insertar();
+    public boolean modificar();
+    public boolean eliminar();
+    ArrayList consulta();
+    
     
 }
