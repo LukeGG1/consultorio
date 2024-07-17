@@ -14,7 +14,7 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import modelos.lote;
+import modelos.producto;
 
 /**
  *
@@ -94,17 +94,64 @@ public class producto extends conexion implements sentencias {
 
     @Override
     public boolean modificar() {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfsost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        String sql = "UPDATE producto SET nombre=?, precio=?, descripcion=? WHERE id_producto=?";
+
+        try (Connection con = getCon(); PreparedStatement stm = con.prepareStatement(sql)) {
+
+            // Establecer los parámetros de la consulta
+            stm.setString(1, this.nombre);
+            stm.setInt(2, this.precio);
+            stm.setString(3, this.descripcion);
+            stm.setInt(4, this.idProducto);
+
+            // Ejecutar la consulta de actualización
+            int filasAfectadas = stm.executeUpdate();
+            return filasAfectadas > 0;
+
+        } catch (SQLException ex) {
+            Logger.getLogger(producto.class.getName()).log(Level.SEVERE, "Error al modificar el producto", ex);
+            return false;
+        }
     }
 
     @Override
     public boolean eliminar() {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        String sql = "DELETE FROM producto WHERE id_producto=?";
+
+        try (Connection con = getCon(); PreparedStatement stm = con.prepareStatement(sql)) {
+
+            stm.setInt(1, this.idProducto);
+
+            int filasAfectadas = stm.executeUpdate();
+            return filasAfectadas > 0;
+
+        } catch (SQLException ex) {
+            Logger.getLogger(producto.class.getName()).log(Level.SEVERE, null, ex);
+            return false;
+        }
     }
 
     @Override
     public ArrayList consulta() {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        ArrayList<producto> listaProductos = new ArrayList<>();
+        String sql = "SELECT * FROM producto";
+        try (Connection con = getCon(); PreparedStatement stm = con.prepareStatement(sql); ResultSet rs = stm.executeQuery()) {
+
+            while (rs.next()) {
+                int id = rs.getInt("id_producto");
+                String nombreProducto = rs.getString("nombre");
+                int precioProducto = rs.getInt("precio");
+                String descripcionProducto = rs.getString("descripcion");
+
+                producto p = new producto(id, nombreProducto, precioProducto, descripcionProducto);
+                listaProductos.add(p);
+            }
+
+        } catch (SQLException ex) {
+            Logger.getLogger(lote.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        return listaProductos;
     }
     
 }

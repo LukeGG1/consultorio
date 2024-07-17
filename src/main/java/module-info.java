@@ -7,6 +7,8 @@ module empresa.consultorio {
     requires org.controlsfx.controls;
 
     opens empresa.consultorio to javafx.fxml;
+    opens modelos to javafx.base;
+
     exports empresa.consultorio;
     exports clases;
 }

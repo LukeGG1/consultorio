@@ -1,14 +1,10 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/javafx/FXMLController.java to edit this template
- */
 package empresa.consultorio;
 
 import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -18,71 +14,99 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.scene.control.TextField;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.MouseEvent;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
+import modelos.lote;
 
-
-// Referencia al escenario principal
-    
-
-/**
- * FXML Controller class
- *
- * @author Milagros Taboada
- */
 public class InventarioController implements Initializable {
 
     @FXML
-    private TableView<?> tblLote;
+    private TableView<lote> tblLote;
     @FXML
-    private TableColumn<?, ?> colProducto;
+    private TableColumn<lote, String> colProducto;
     @FXML
-    private TableColumn<?, ?> colCantidad;
+    private TableColumn<lote, Integer> colCantidad;
     @FXML
-    private TableColumn<?, ?> colLote;
+    private TableColumn<lote, String> colLote;
     @FXML
-    private TableColumn<?, ?> colVencimiento;
+    private TableColumn<lote, String> colVencimiento;
     @FXML
     private Button btnAñadir;
-    
-    
-    private Stage stage;
 
-    // Método para establecer el escenario
-    public void setStage(Stage stage) {
-        this.stage = stage;
-    }
+    private lote l = new lote();
+    private ObservableList<lote> registros;
+    @FXML
+    private TextField txtBuscar;
+    @FXML
+    private Button btnVerProductos;
 
-    /**
-     * Initializes the controller class.
-     */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        // TODO
-    }    
-
-
-    @FXML
-    private void mostrarFila(MouseEvent event) {
+        inicializarTabla();
+        mostrarDatos();
     }
 
     @FXML
     private void Añadir(ActionEvent event) {
-        abrirFxml("Producto.fxml","Formulario Cliente");
+        abrirFormulario("Producto.fxml", "Añadir Producto", null);
     }
-    
-    private void abrirFxml(String fxml, String titulo) {
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource(fxml));
-            Parent root = loader.load();
-            Stage stage = new Stage();
-            stage.setTitle(titulo);
-            stage.setScene(new Scene(root));
-            stage.show();
-        } catch (IOException ex) {
-            Logger.getLogger(InventarioController.class.getName()).log(Level.SEVERE, null, ex);
+
+    @FXML
+    private void modificarLote(MouseEvent event) {
+        lote loteSeleccionado = tblLote.getSelectionModel().getSelectedItem();
+        if (loteSeleccionado != null) {
+            abrirFormulario("loteEditar.fxml", "Editar Lote", loteSeleccionado);
         }
-        
     }
-    
+
+    private void inicializarTabla() {
+        colProducto.setCellValueFactory(new PropertyValueFactory<>("nombreProducto"));
+        colCantidad.setCellValueFactory(new PropertyValueFactory<>("cantidad"));
+        colLote.setCellValueFactory(new PropertyValueFactory<>("fechaLote"));
+        colVencimiento.setCellValueFactory(new PropertyValueFactory<>("fechaVencimiento"));
+    }
+
+    private void mostrarDatos() {
+        registros = FXCollections.observableArrayList(l.consulta());
+        tblLote.setItems(registros);
+    }
+
+    private void abrirFormulario(String fxml, String titulo, lote loteExistente) {
+    try {
+        FXMLLoader loader = new FXMLLoader(getClass().getResource(fxml));
+        Parent root = loader.load();
+        Stage stage = new Stage();
+        stage.setTitle(titulo);
+        stage.setScene(new Scene(root));
+        stage.initModality(Modality.APPLICATION_MODAL); // Bloquear interacción con otras ventanas
+
+        // Si se proporciona un lote existente, inicializar el controlador del formulario
+        if (loteExistente != null) {
+            LoteEditarController controller = loader.getController();
+            controller.initData(loteExistente.getIdLote(), loteExistente);
+        }
+
+        stage.showAndWait();
+
+        // Actualizar tabla después de cerrar formulario
+        actualizarTabla();
+
+    } catch (IOException ex) {
+        ex.printStackTrace();
+    }
+}
+
+
+    private void actualizarTabla() {
+        registros.clear();
+        registros.addAll(l.consulta());
+    }
+
+    @FXML
+    private void verProductos(ActionEvent event) {
+        abrirFormulario("VerProducto.fxml", "ver Producto", null);
+    }
 }

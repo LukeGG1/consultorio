@@ -17,8 +17,7 @@ public class App extends Application {
     public void start(Stage stage) throws IOException {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/empresa/consultorio/inventario.fxml"));
         Parent root = loader.load();
-        PacientesController controller = loader.getController();
-        controller.setStage(stage); // Pasar la referencia del stage al controlador
+         // Pasar la referencia del stage al controlador
 
         // Establecer estilos de ventana sin decoraciones
         stage.initStyle(StageStyle.UNDECORATED);
@@ -35,7 +34,7 @@ public class App extends Application {
         });
 
         // Configurar escena y mostrar la ventana
-        stage.setScene(new Scene(root, 800, 500));
+        stage.setScene(new Scene(root,883, 604));
         stage.show();
     }
 

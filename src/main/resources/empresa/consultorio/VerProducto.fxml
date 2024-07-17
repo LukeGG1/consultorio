@@ -13,7 +13,7 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane id="AnchorPane" prefHeight="604.0" prefWidth="883.0" styleClass="mainFxmlClass" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="empresa.consultorio.InventarioController">
+<AnchorPane id="AnchorPane" prefHeight="604.0" prefWidth="883.0" styleClass="mainFxmlClass" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="empresa.consultorio.VerProductoController">
     <stylesheets>
         <URL value="@/empresa/consultorio/styles.css" />
     </stylesheets>
@@ -36,7 +36,7 @@
                   <Insets left="10.0" top="7.0" />
                </HBox.margin>
             </Label>
-            <TextField fx:id="txtBuscar" prefHeight="31.0" prefWidth="369.0" promptText="🔍 Buscar Lote">
+            <TextField fx:id="txtBuscar" prefHeight="26.0" prefWidth="426.0" promptText="🔍 Buscar Producto">
                <HBox.margin>
                   <Insets left="10.0" top="7.0" />
                </HBox.margin>
@@ -44,24 +44,23 @@
                   <Font size="15.0" />
                </font>
             </TextField>
-            <Button fx:id="btnAñadir" mnemonicParsing="false" onAction="#Añadir" prefHeight="26.0" prefWidth="118.0" style="-fx-background-radius: 50;" text="Añadir Producto">
+            <Button fx:id="btnAñadir" mnemonicParsing="false" onAction="#Añadir" style="-fx-background-radius: 50;" text="Añadir Producto">
                <HBox.margin>
                   <Insets left="50.0" top="7.0" />
                </HBox.margin>
             </Button>
-            <Button fx:id="btnVerProductos" mnemonicParsing="false" onAction="#verProductos" prefHeight="26.0" prefWidth="105.0" style="-fx-background-radius: 50;" text="Ver Productos">
+            <Button fx:id="btnVerLotes" mnemonicParsing="false" onAction="#verLotes" style="-fx-background-radius: 50;" text="Ver Lotes">
                <HBox.margin>
                   <Insets left="50.0" top="7.0" />
                </HBox.margin>
             </Button>
          </children>
       </HBox>
-      <TableView fx:id="tblLote" layoutX="34.0" layoutY="118.0" onMouseClicked="#modificarLote" prefHeight="200.0" prefWidth="800.0">
+      <TableView fx:id="tblProducto" layoutX="164.0" layoutY="117.0" onMouseClicked="#modificarProducto" prefHeight="200.0" prefWidth="586.0">
         <columns>
           <TableColumn fx:id="colProducto" prefWidth="200.0" text="Producto" />
-          <TableColumn fx:id="colCantidad" prefWidth="200.0" text="Cantidad" />
-            <TableColumn fx:id="colLote" prefWidth="200.0" text="Fecha Lote" />
-            <TableColumn fx:id="colVencimiento" prefWidth="200.0" text="Vencimiento" />
+          <TableColumn fx:id="colPrecio" prefWidth="200.0" text="Precio" />
+            <TableColumn fx:id="colDescripcion" prefWidth="200.0" text="Descripcion" />
         </columns>
       </TableView>
    </children>

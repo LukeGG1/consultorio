@@ -187,13 +187,14 @@ public class PacientesController {
     }
 
     private void configurarAutocompletado(TextField textField, ObservableList<String> itemList) {
-        TextFields.bindAutoCompletion(textField, param -> {
-            List<String> filteredList = itemList.stream()
-                    .filter(item -> item.toLowerCase().contains(param.getUserText().toLowerCase()))
-                    .collect(Collectors.toList());
-            return filteredList;
-        });
-    }
+    TextFields.bindAutoCompletion(textField, param -> {
+        List<String> filteredList = itemList.stream()
+                .filter(item -> item.toLowerCase().contains(param.getUserText().toLowerCase()))
+                .limit(3) // Limitar a 3 resultados
+                .collect(Collectors.toList());
+        return filteredList;
+    });
+}
 
     private void limpiarCampos() {
         nombreTextField.clear();

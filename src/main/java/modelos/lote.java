@@ -11,6 +11,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class lote extends conexion implements sentencias {
+
     private int idLote;
     private String fechaLote;
     private String fechaFabricacion;
@@ -18,11 +19,12 @@ public class lote extends conexion implements sentencias {
     private int costoLote;
     private int cantidad;
     private int productoIdProducto;
+    private String nombreProducto; // Añadir el nombre del producto
 
     public lote() {
     }
 
-    public lote(int idLote, String fechaLote, String fechaFabricacion, String fechaVencimiento, int costoLote, int cantidad, int productoIdProducto) {
+    public lote(int idLote, String fechaLote, String fechaFabricacion, String fechaVencimiento, int costoLote, int cantidad, int productoIdProducto, String nombreProducto) {
         this.idLote = idLote;
         this.fechaLote = fechaLote;
         this.fechaFabricacion = fechaFabricacion;
@@ -30,6 +32,7 @@ public class lote extends conexion implements sentencias {
         this.costoLote = costoLote;
         this.cantidad = cantidad;
         this.productoIdProducto = productoIdProducto;
+        this.nombreProducto = nombreProducto;
     }
 
     public int getIdLote() {
@@ -88,12 +91,19 @@ public class lote extends conexion implements sentencias {
         this.productoIdProducto = productoIdProducto;
     }
 
+    public String getNombreProducto() {
+        return nombreProducto;
+    }
+
+    public void setNombreProducto(String nombreProducto) {
+        this.nombreProducto = nombreProducto;
+    }
+
     @Override
     public boolean insertar() {
         String sql = "INSERT INTO lote (fecha_lote, fecha_fabricacion, fecha_vencimiento, costo_lote, cantidad, producto_id_producto) VALUES (?, ?, ?, ?, ?, ?)";
 
-        try (Connection con = getCon();
-            PreparedStatement stm = con.prepareStatement(sql)) {
+        try (Connection con = getCon(); PreparedStatement stm = con.prepareStatement(sql)) {
 
             stm.setString(1, this.fechaLote);
             stm.setString(2, this.fechaFabricacion);
@@ -113,11 +123,12 @@ public class lote extends conexion implements sentencias {
 
     @Override
     public boolean modificar() {
+        // Consulta SQL para actualizar el registro de lote
         String sql = "UPDATE lote SET fecha_lote=?, fecha_fabricacion=?, fecha_vencimiento=?, costo_lote=?, cantidad=?, producto_id_producto=? WHERE id_lote=?";
 
-        try (Connection con = getCon();
-             PreparedStatement stm = con.prepareStatement(sql)) {
+        try (Connection con = getCon(); PreparedStatement stm = con.prepareStatement(sql)) {
 
+            // Establecer los parámetros de la consulta
             stm.setString(1, this.fechaLote);
             stm.setString(2, this.fechaFabricacion);
             stm.setString(3, this.fechaVencimiento);
@@ -126,11 +137,12 @@ public class lote extends conexion implements sentencias {
             stm.setInt(6, this.productoIdProducto);
             stm.setInt(7, this.idLote);
 
+            // Ejecutar la consulta de actualización
             int filasAfectadas = stm.executeUpdate();
             return filasAfectadas > 0;
 
         } catch (SQLException ex) {
-            Logger.getLogger(lote.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(lote.class.getName()).log(Level.SEVERE, "Error al modificar el lote", ex);
             return false;
         }
     }
@@ -139,8 +151,7 @@ public class lote extends conexion implements sentencias {
     public boolean eliminar() {
         String sql = "DELETE FROM lote WHERE id_lote=?";
 
-        try (Connection con = getCon();
-             PreparedStatement stm = con.prepareStatement(sql)) {
+        try (Connection con = getCon(); PreparedStatement stm = con.prepareStatement(sql)) {
 
             stm.setInt(1, this.idLote);
 
@@ -154,24 +165,23 @@ public class lote extends conexion implements sentencias {
     }
 
     @Override
-    public ArrayList consulta() {
+    public ArrayList<lote> consulta() {
         ArrayList<lote> listaLotes = new ArrayList<>();
-        String sql = "SELECT * FROM lote";
+        String sql = "SELECT l.*, p.nombre FROM lote l JOIN producto p ON l.producto_id_producto = p.id_producto";
 
-        try (Connection con = getCon();
-             PreparedStatement stm = con.prepareStatement(sql);
-             ResultSet rs = stm.executeQuery()) {
+        try (Connection con = getCon(); PreparedStatement stm = con.prepareStatement(sql); ResultSet rs = stm.executeQuery()) {
 
             while (rs.next()) {
-                lote l = new lote();
-                l.setIdLote(rs.getInt("id_lote"));
-                l.setFechaLote(rs.getString("fecha_lote"));
-                l.setFechaFabricacion(rs.getString("fecha_fabricacion"));
-                l.setFechaVencimiento(rs.getString("fecha_vencimiento"));
-                l.setCostoLote(rs.getInt("costo_lote"));
-                l.setCantidad(rs.getInt("cantidad"));
-                l.setProductoIdProducto(rs.getInt("producto_id_producto"));
+                int id = rs.getInt("id_lote");
+                String fechaLote = rs.getString("fecha_lote");
+                String fechaFabricacion = rs.getString("fecha_fabricacion");
+                String fechaVencimiento = rs.getString("fecha_vencimiento");
+                int costoLote = rs.getInt("costo_lote");
+                int cantidad = rs.getInt("cantidad");
+                int productoIdProducto = rs.getInt("producto_id_producto");
+                String nombreProducto = rs.getString("nombre");
 
+                lote l = new lote(id, fechaLote, fechaFabricacion, fechaVencimiento, costoLote, cantidad, productoIdProducto, nombreProducto);
                 listaLotes.add(l);
             }
 
@@ -181,4 +191,5 @@ public class lote extends conexion implements sentencias {
 
         return listaLotes;
     }
+
 }

@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.net.URL?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.DatePicker?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane id="AnchorPane" prefHeight="500.0" prefWidth="500.0" styleClass="mainFxmlClass" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="empresa.consultorio.LoteEditarController">
+    <stylesheets>
+        <URL value="@/empresa/consultorio/styles.css" />
+    </stylesheets>
+   <children>
+      <VBox alignment="TOP_CENTER" layoutX="136.0" layoutY="14.0" prefHeight="500.0" prefWidth="491.0" spacing="10.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="163.0" AnchorPane.topAnchor="0.0">
+         <children>
+            <Label fx:id="labelId" text="ID LOTE">
+               <VBox.margin>
+                  <Insets top="20.0" />
+               </VBox.margin>
+            </Label>
+            <TextField fx:id="txtNom" promptText="Ingrese el nombre del producto">
+               <VBox.margin>
+                  <Insets left="90.0" right="90.0" top="30.0" />
+               </VBox.margin>
+            </TextField>
+            <Label text="Fecha Lote">
+               <font>
+                  <Font size="16.0" />
+               </font>
+            </Label>
+            <DatePicker fx:id="txtFechaLote" />
+            <Label text="Fecha Fabricacion">
+               <font>
+                  <Font size="16.0" />
+               </font>
+            </Label>
+            <DatePicker fx:id="txtFechaFabricacion" />
+            <Label text="Fecha Vencimiento">
+               <font>
+                  <Font size="16.0" />
+               </font>
+            </Label>
+            <DatePicker fx:id="txtFechaVencimiento" />
+            <Label text="Costo">
+               <font>
+                  <Font size="16.0" />
+               </font>
+            </Label>
+            <TextField fx:id="txtCosto">
+               <VBox.margin>
+                  <Insets left="100.0" right="100.0" />
+               </VBox.margin>
+            </TextField>
+            <Label text="Cantidad">
+               <font>
+                  <Font size="16.0" />
+               </font>
+            </Label>
+            <TextField fx:id="txtCantidad">
+               <VBox.margin>
+                  <Insets left="100.0" right="100.0" />
+               </VBox.margin>
+            </TextField>
+         </children>
+      </VBox>
+      <VBox alignment="TOP_CENTER" layoutX="492.0" prefHeight="500.0" prefWidth="162.0" spacing="10.0" AnchorPane.leftAnchor="492.0">
+         <children>
+            <Button fx:id="btnModificar" mnemonicParsing="false" onAction="#modificar" text="Modificar">
+               <VBox.margin>
+                  <Insets top="200.0" />
+               </VBox.margin>
+            </Button>
+            <Button fx:id="btnEliminar" mnemonicParsing="false" onAction="#eliminar" text="Eliminar" />
+         </children>
+      </VBox>
+   </children>
+</AnchorPane>
