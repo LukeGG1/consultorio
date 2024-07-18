@@ -1,26 +1,24 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package modelos;
 
-import clases.conexion;
 import clases.sentencias;
 import java.sql.Connection;
+import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import modelos.producto;
 
 /**
  *
  * @author Milagros Taboada
  */
-public class producto extends conexion implements sentencias {
+public class producto implements sentencias {
+    private static final String URL = "jdbc:mysql://localhost:3306/consultorio";
+    private static final String USER = "root";
+    private static final String PASSWORD = "";
+
     private int idProducto;
     private String nombre;
     private int precio;
@@ -67,17 +65,18 @@ public class producto extends conexion implements sentencias {
     public void setDescripcion(String descripcion) {
         this.descripcion = descripcion;
     }
-    
-    
+
+    private Connection getCon() throws SQLException {
+        return DriverManager.getConnection(URL, USER, PASSWORD);
+    }
 
     @Override
     public boolean insertar() {
-        String sql = "INSERT INTO `producto`( `nombre`, `precio`, `descripcion`) VALUES (?, ?, ?)";
+        String sql = "INSERT INTO producto (nombre, precio, descripcion) VALUES (?, ?, ?)";
 
         try (Connection con = getCon(); 
             PreparedStatement stm = con.prepareStatement(sql)) {
 
-            // Aquí debes proporcionar el valor adecuado para producto_id_producto
             stm.setString(1, this.nombre);
             stm.setInt(2, this.precio);
             stm.setString(3, this.descripcion);
@@ -98,13 +97,11 @@ public class producto extends conexion implements sentencias {
 
         try (Connection con = getCon(); PreparedStatement stm = con.prepareStatement(sql)) {
 
-            // Establecer los parámetros de la consulta
             stm.setString(1, this.nombre);
             stm.setInt(2, this.precio);
             stm.setString(3, this.descripcion);
             stm.setInt(4, this.idProducto);
 
-            // Ejecutar la consulta de actualización
             int filasAfectadas = stm.executeUpdate();
             return filasAfectadas > 0;
 
@@ -116,23 +113,56 @@ public class producto extends conexion implements sentencias {
 
     @Override
     public boolean eliminar() {
-        String sql = "DELETE FROM producto WHERE id_producto=?";
+        String sqlEliminarLotes = "DELETE FROM lote WHERE producto_id_producto=?";
+        String sqlEliminarProducto = "DELETE FROM producto WHERE id_producto=?";
+        Connection con = null;
 
-        try (Connection con = getCon(); PreparedStatement stm = con.prepareStatement(sql)) {
+        try {
+            con = getCon();
+            con.setAutoCommit(false);
 
-            stm.setInt(1, this.idProducto);
+            try (PreparedStatement stmEliminarLotes = con.prepareStatement(sqlEliminarLotes);
+                 PreparedStatement stmEliminarProducto = con.prepareStatement(sqlEliminarProducto)) {
 
-            int filasAfectadas = stm.executeUpdate();
-            return filasAfectadas > 0;
+                // Eliminar lotes asociados
+                stmEliminarLotes.setInt(1, this.idProducto);
+                stmEliminarLotes.executeUpdate();
 
+                // Eliminar producto
+                stmEliminarProducto.setInt(1, this.idProducto);
+                int filasAfectadas = stmEliminarProducto.executeUpdate();
+
+                // Confirmar transacción
+                con.commit();
+
+                return filasAfectadas > 0;
+
+            }
         } catch (SQLException ex) {
             Logger.getLogger(producto.class.getName()).log(Level.SEVERE, null, ex);
+
+            if (con != null) {
+                try {
+                    con.rollback();
+                } catch (SQLException e) {
+                    Logger.getLogger(producto.class.getName()).log(Level.SEVERE, null, e);
+                }
+            }
+
             return false;
+        } finally {
+            if (con != null) {
+                try {
+                    con.setAutoCommit(true);
+                } catch (SQLException e) {
+                    Logger.getLogger(producto.class.getName()).log(Level.SEVERE, null, e);
+                }
+            }
         }
     }
 
     @Override
-    public ArrayList consulta() {
+    public ArrayList<producto> consulta() {
         ArrayList<producto> listaProductos = new ArrayList<>();
         String sql = "SELECT * FROM producto";
         try (Connection con = getCon(); PreparedStatement stm = con.prepareStatement(sql); ResultSet rs = stm.executeQuery()) {
@@ -148,10 +178,9 @@ public class producto extends conexion implements sentencias {
             }
 
         } catch (SQLException ex) {
-            Logger.getLogger(lote.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(producto.class.getName()).log(Level.SEVERE, null, ex);
         }
 
         return listaProductos;
     }
-    
 }

@@ -52,8 +52,8 @@
                   <Font size="15.0" />
                </font>
             </TextField>
-            <Button fx:id="btnAñadir" layoutX="530.0" layoutY="7.0" mnemonicParsing="false" onAction="#Añadir" prefHeight="26.0" prefWidth="118.0" style="-fx-background-radius: 50;" text="Añadir Producto" />
-            <Button fx:id="btnVerProductos" layoutX="658.0" layoutY="7.0" mnemonicParsing="false" onAction="#verProductos" prefHeight="26.0" prefWidth="105.0" style="-fx-background-radius: 50;" text="Ver Productos" />
+            <Button fx:id="btnAñadirIngreso" layoutX="530.0" layoutY="7.0" mnemonicParsing="false" onAction="#AñadirIngreso" prefHeight="26.0" prefWidth="118.0" style="-fx-background-radius: 50;" text="Añadir Ingreso" />
+            <Button fx:id="btnAñadirEgreso" layoutX="658.0" layoutY="7.0" mnemonicParsing="false" onAction="#AñadirEgreso" prefHeight="26.0" prefWidth="105.0" style="-fx-background-radius: 50;" text="Añadir Egreso" />
          </children>
       </AnchorPane>
 

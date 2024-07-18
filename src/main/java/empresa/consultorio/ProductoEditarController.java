@@ -48,6 +48,7 @@ public class ProductoEditarController implements Initializable {
     private Button btnEliminar;
     
     private producto p = new producto();
+    
     private ObservableList<String> productosList;
 
     /**
@@ -87,11 +88,13 @@ public class ProductoEditarController implements Initializable {
 
     @FXML
     private void eliminarProducto(ActionEvent event) {
-        if (p.eliminar()) {
+        if (p.eliminar() ) {
             mostrarAlerta(Alert.AlertType.INFORMATION, "El sistema comunica:", "Eliminado correctamente");
         } else {
             mostrarAlerta(Alert.AlertType.ERROR, "El sistema comunica:", "Registro no eliminado.");
         }
+        
+        
     }
     
     private void mostrarAlerta(Alert.AlertType tipo, String titulo, String contenido) {

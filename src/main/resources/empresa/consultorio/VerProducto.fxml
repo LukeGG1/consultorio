@@ -36,7 +36,7 @@
                   <Insets left="10.0" top="7.0" />
                </HBox.margin>
             </Label>
-            <TextField fx:id="txtBuscar" prefHeight="26.0" prefWidth="426.0" promptText="🔍 Buscar Producto">
+            <TextField fx:id="txtBuscar" onKeyReleased="#busqueda" prefHeight="26.0" prefWidth="426.0" promptText="🔍 Buscar Producto">
                <HBox.margin>
                   <Insets left="10.0" top="7.0" />
                </HBox.margin>
