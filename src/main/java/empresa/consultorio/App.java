@@ -15,7 +15,7 @@ public class App extends Application {
 
     @Override
     public void start(Stage stage) throws IOException {
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/empresa/consultorio/Contabilidad.fxml"));
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/empresa/consultorio/inventario.fxml"));
         Parent root = loader.load();
          // Pasar la referencia del stage al controlador
 
