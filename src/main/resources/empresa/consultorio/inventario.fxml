@@ -20,7 +20,7 @@
     </stylesheets>
    <children>
       <!-- Tabla de productos en el fondo -->
-      <TableView fx:id="tblLote" layoutX="64.0" layoutY="118.0" onMouseClicked="#modificarLote" prefHeight="200.0" prefWidth="800.0">
+      <TableView fx:id="tblMovimientos" layoutX="64.0" layoutY="118.0" onMouseClicked="#modificarLote" prefHeight="200.0" prefWidth="800.0">
         <columns>
           <TableColumn fx:id="colProducto" prefWidth="200.0" text="Producto" />
           <TableColumn fx:id="colCantidad" prefWidth="200.0" text="Cantidad" />

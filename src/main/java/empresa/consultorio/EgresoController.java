@@ -15,7 +15,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import javafx.event.ActionEvent;
 
-public class IngresoController {
+public class EgresoController {
 
     @FXML
     private ComboBox<String> comboMotivo;
@@ -29,26 +29,37 @@ public class IngresoController {
     @FXML
     private void initialize() {
         // Inicializar el ComboBox con motivos de ingreso
-        comboMotivo.setItems(FXCollections.observableArrayList("Consulta", "Producto", "Frecuencia"));
-        
+        comboMotivo.setItems(FXCollections.observableArrayList("Servicio", "Lote", "Salario"));
     }
 
-    @FXML
-    private void handleGuardar(ActionEvent event) throws SQLException {
-        String tipo = "Ingreso";
+    private void handleGuardar(ActionEvent event) {
+        String tipo = "Egreso";
         String motivo = comboMotivo.getValue();
-        double monto = Double.parseDouble(textMonto.getText());
+
+        double monto;
+        try {
+            monto = Double.parseDouble(textMonto.getText());
+        } catch (NumberFormatException e) {
+            mostrarAlerta("Error", "Monto inválido. Por favor, ingrese un número válido.");
+            return;
+        }
+
         String descripcion = textDescripcion.getText();
-        Date fecha = Date.valueOf(LocalDate.MAX);
+        Date fecha = Date.valueOf(LocalDate.now()); // Verifica si esta fecha es válida para tu base de datos
 
         Movimiento nuevoMovimiento = new Movimiento(tipo, motivo, monto, descripcion, fecha);
-        Movimiento.insertarMovimiento(nuevoMovimiento);
 
-        mostrarAlerta("Éxito", "Ingreso guardado exitosamente.");
+        try {
+            Movimiento.insertarMovimiento(nuevoMovimiento);
+            mostrarAlerta("Éxito", "Ingreso guardado exitosamente.");
+        } catch (SQLException e) {
+            mostrarAlerta("Error", "No se pudo guardar el ingreso: " + e.getMessage());
+            e.printStackTrace(); // Esto te dará más detalles del error
+        }
 
-        // Limpiar los campos después de guardar
         limpiarCampos();
     }
+
 
     private void mostrarAlerta(String titulo, String contenido) {
         Alert alert = new Alert(AlertType.INFORMATION);

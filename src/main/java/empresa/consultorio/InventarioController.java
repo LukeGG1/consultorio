@@ -41,13 +41,9 @@ public class InventarioController implements Initializable {
 
     @FXML
     private TableView<lote> tblLote;
-    @FXML
     private TableColumn<lote, String> colProducto;
-    @FXML
     private TableColumn<lote, Integer> colCantidad;
-    @FXML
     private TableColumn<lote, String> colLote;
-    @FXML
     private TableColumn<lote, String> colVencimiento;
     @FXML
     private TextField txtBuscar;
@@ -73,10 +69,8 @@ public class InventarioController implements Initializable {
     private AnchorPane pane1, pane2;
 
     private boolean isMenuOpen = false;
-    @FXML
-    private Button btnAñadirIngreso;
-    @FXML
-    private Button btnAñadirEgreso;
+    
+    
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
@@ -106,6 +100,8 @@ public class InventarioController implements Initializable {
             closeMenu();
         });
     }
+    
+    @FXML
 
     private void Añadir(ActionEvent event) {
         abrirFormulario("Producto.fxml", "Añadir Producto", null);
@@ -177,7 +173,8 @@ public class InventarioController implements Initializable {
         registros.clear();
         registros.addAll(l.consulta());
     }
-
+    
+    @FXML
     private void verProductos(ActionEvent event) {
         abrirFormulario("VerProducto.fxml", "Ver Producto", null);
     }
@@ -279,6 +276,19 @@ public class InventarioController implements Initializable {
             e.printStackTrace();
         }
     }
+    public void switchToConfiguracion(ActionEvent event) {
+        btnConfiguracion.getScene().getWindow().hide();
+
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/empresa/consultorio/secondary.fxml"));
+            Parent root = loader.load();
+            Stage stage = new Stage();
+            stage.setScene(new Scene(root));
+            stage.show();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
     public void switchToAyuda(ActionEvent event) {
         btnAyuda.getScene().getWindow().hide();
@@ -300,12 +310,5 @@ public class InventarioController implements Initializable {
         
     }
 
-    @FXML
-    private void AñadirIngreso(ActionEvent event) {
-        abrirFormulario("Ingreso.fxml", "Ver ingreso", null);
-    }
-
-    @FXML
-    private void AñadirEgreso(ActionEvent event) {
-    }
+    
 }

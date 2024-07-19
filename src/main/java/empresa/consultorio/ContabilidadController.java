@@ -4,9 +4,43 @@
  */
 package empresa.consultorio;
 
+import com.jfoenix.controls.JFXButton;
+import java.io.IOException;
 import java.net.URL;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.List;
 import java.util.ResourceBundle;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.stream.Collectors;
+import javafx.animation.FadeTransition;
+import javafx.animation.TranslateTransition;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
+import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
+import javafx.scene.control.TextField;
+import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.image.ImageView;
+import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.AnchorPane;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
+import javafx.util.Duration;
+import modelos.Movimiento;
+import org.controlsfx.control.textfield.TextFields;
 
 /**
  * FXML Controller class
@@ -15,12 +49,278 @@ import javafx.fxml.Initializable;
  */
 public class ContabilidadController implements Initializable {
 
+    @FXML
+    private TableView< Movimiento> tblMovimiento;
+    @FXML
+    private TableColumn<Movimiento, String> colTipo;
+    @FXML
+    private TableColumn<Movimiento, String> colMotivo;
+    @FXML
+    private TableColumn<Movimiento, Integer> colMonto;
+    @FXML
+    private TableColumn<Movimiento, String> colFecha;
+    
+    private TextField txtBuscar;
+    @FXML
+    private Button btnAñadirIngreso;
+    @FXML
+    private Button btnAñadirEgreso;
+    
+    @FXML
+    private JFXButton btnPacientes;
+    @FXML
+    private JFXButton btnInventario;
+    @FXML
+    private JFXButton btnContabilidad;
+    @FXML
+    private JFXButton btnConfiguracion;
+    @FXML
+    private JFXButton btnAyuda;
+    @FXML
+    private ImageView exit, menu;
+    @FXML
+    private AnchorPane pane1, pane2;
+    
+    private Movimiento m = new Movimiento();
+    private ObservableList<Movimiento> registros;
+    ObservableList<Movimiento> registrosFiltrados;
+    private ObservableList<String> MovimientoList;
+
+    private boolean isMenuOpen = false;
+
     /**
      * Initializes the controller class.
      */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        // TODO
-    }    
+        MovimientoList = FXCollections.observableArrayList();
+        inicializarTabla();
+        mostrarDatos();
+        cargarNombresProductos(MovimientoList);
+        configurarAutocompletado(txtBuscar, MovimientoList);
+
+        exit.setOnMouseClicked(event -> {
+            System.exit(0);
+        });
+
+        // Inicializar el menú como cerrado
+        pane1.setVisible(false);
+        pane2.setTranslateX(-pane2.getPrefWidth()); // Asegúrate de que pane2 esté fuera de la vista
+
+        menu.setOnMouseClicked(event -> {
+            if (isMenuOpen) {
+                closeMenu();
+            } else {
+                openMenu();
+            }
+        });
+
+        pane1.setOnMouseClicked(event -> {
+            closeMenu();
+        });
+    }
+
+    
+
+    @FXML
+    private void modificarLote(MouseEvent event) {
+        Movimiento MovimientoSeleccionado = tblMovimiento.getSelectionModel().getSelectedItem();
+        if (MovimientoSeleccionado != null) {
+            abrirFormulario("MovimientoEditar.fxml", "Editar Movimiento", MovimientoSeleccionado);
+        }
+        
+    }
+
+    private void inicializarTabla() {
+        colTipo.setCellValueFactory(new PropertyValueFactory<>("tipo"));
+        colMotivo.setCellValueFactory(new PropertyValueFactory<>("motivo"));
+        colMonto.setCellValueFactory(new PropertyValueFactory<>("monto"));
+        colFecha.setCellValueFactory(new PropertyValueFactory<>("fecha"));
+        
+    }
+
+    private void mostrarDatos() {
+        registros = FXCollections.observableArrayList(m.consulta());
+        tblMovimiento.setItems(registros);
+    }
+
+    private void abrirFormulario(String fxml, String titulo, Movimiento MovimientoExistente) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource(fxml));
+            Parent root = loader.load();
+            Stage stage = new Stage();
+            stage.setTitle(titulo);
+            stage.setScene(new Scene(root));
+            stage.initModality(Modality.APPLICATION_MODAL); // Bloquear interacción con otras ventanas
+
+            // Si se proporciona un lote existente, inicializar el controlador del formulario
+            if (MovimientoExistente != null) {
+                MovimientoEditarController controller = loader.getController();
+                controller.initData( MovimientoExistente);
+
+            }
+
+            stage.showAndWait();
+
+            // Actualizar tabla después de cerrar formulario
+            actualizarTabla();
+
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    @FXML
+    private void busqueda(KeyEvent event) {
+        registrosFiltrados = FXCollections.observableArrayList();
+        String buscar = txtBuscar.getText();
+        if (buscar.isEmpty()) {
+            tblMovimiento.setItems(registros);
+        } else {
+            registrosFiltrados.clear();
+            for (Movimiento registro : registros) {
+                if (registro.getMotivo().toLowerCase().contains(buscar.toLowerCase())) {
+                    registrosFiltrados.add(registro);
+                }
+            }
+            tblMovimiento.setItems(registrosFiltrados);
+        }
+    }
+
+    private void actualizarTabla() {
+        registros.clear();
+        registros.addAll(m.consulta());
+    }
+
+    
+
+    private void configurarAutocompletado(TextField textField, ObservableList<String> itemList) {
+        TextFields.bindAutoCompletion(textField, param -> {
+            List<String> filteredList = itemList.stream()
+                    .filter(item -> item.toLowerCase().contains(param.getUserText().toLowerCase()))
+                    .limit(3) // Limitar a 3 resultados
+                    .collect(Collectors.toList());
+            return filteredList;
+        });
+    }
+
+    private void cargarNombresProductos(ObservableList<String> itemList) {
+        String sql = "SELECT motivo FROM movimiento";
+        try (Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/consultorio", "root", "");
+             PreparedStatement stm = con.prepareStatement(sql);
+             ResultSet rs = stm.executeQuery()) {
+
+            while (rs.next()) {
+                itemList.add(rs.getString("motivo"));
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    private void openMenu() {
+        isMenuOpen = true;
+
+        pane1.setVisible(true);
+
+        FadeTransition fadeTransition = new FadeTransition(Duration.seconds(0.5), pane1);
+        fadeTransition.setFromValue(0);
+        fadeTransition.setToValue(0.15);
+        fadeTransition.play();
+
+        TranslateTransition translateTransition = new TranslateTransition(Duration.seconds(0.5), pane2);
+        translateTransition.setToX(0);
+        translateTransition.play();
+    }
+
+    private void closeMenu() {
+        isMenuOpen = false;
+
+        FadeTransition fadeTransition = new FadeTransition(Duration.seconds(0.5), pane1);
+        fadeTransition.setFromValue(0.15);
+        fadeTransition.setToValue(0);
+        fadeTransition.play();
+
+        fadeTransition.setOnFinished(event -> {
+            pane1.setVisible(false);
+        });
+
+        TranslateTransition translateTransition = new TranslateTransition(Duration.seconds(0.5), pane2);
+        translateTransition.setToX(-pane2.getWidth());
+        translateTransition.play();
+    }
+
+    public void switchToPacientes(ActionEvent event) {
+        btnPacientes.getScene().getWindow().hide();
+
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/empresa/consultorio/secondary.fxml"));
+            Parent root = loader.load();
+            Stage stage = new Stage();
+            stage.setScene(new Scene(root));
+            stage.show();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void switchToProductos(ActionEvent event) {
+        btnInventario.getScene().getWindow().hide();
+
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/empresa/consultorio/secondary.fxml"));
+            Parent root = loader.load();
+            Stage stage = new Stage();
+            stage.setScene(new Scene(root));
+            stage.show();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void switchToContabilidad(ActionEvent event) {
+        btnContabilidad.getScene().getWindow().hide();
+
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/empresa/consultorio/inventario.fxml"));
+            Parent root = loader.load();
+            Stage stage = new Stage();
+            stage.setScene(new Scene(root));
+            stage.show();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void switchToAyuda(ActionEvent event) {
+        btnAyuda.getScene().getWindow().hide();
+
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/empresa/consultorio/inventario.fxml"));
+            Parent root = loader.load();
+            Stage stage = new Stage();
+            stage.setScene(new Scene(root));
+            stage.show();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @FXML
+    private void abrirInventario(ActionEvent event) {
+        abrirFormulario("inventario.fxml", "Ver inventario", null);
+        
+    }
+
+    @FXML
+    private void AñadirIngreso(ActionEvent event) {
+        abrirFormulario("Ingreso.fxml", "Ver ingreso", null);
+    }
+
+    @FXML
+    private void AñadirEgreso(ActionEvent event) {
+        abrirFormulario("Egreso.fxml", "Ver Egreso", null);
+    }
+    
     
 }

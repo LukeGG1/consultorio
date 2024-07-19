@@ -14,18 +14,18 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane id="AnchorPane" prefHeight="604.0" prefWidth="883.0" styleClass="mainFxmlClass" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="empresa.consultorio.InventarioController">
+<AnchorPane id="AnchorPane" prefHeight="604.0" prefWidth="883.0" styleClass="mainFxmlClass" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="empresa.consultorio.ContabilidadController">
     <stylesheets>
         <URL value="@/empresa/consultorio/styles.css" />
     </stylesheets>
    <children>
       <!-- Tabla de productos en el fondo -->
-      <TableView fx:id="tblLote" layoutX="64.0" layoutY="118.0" onMouseClicked="#modificarLote" prefHeight="200.0" prefWidth="800.0">
+      <TableView fx:id="tblMovimiento" layoutX="64.0" layoutY="118.0" onMouseClicked="#modificarLote" prefHeight="200.0" prefWidth="800.0">
         <columns>
-          <TableColumn fx:id="colProducto" prefWidth="200.0" text="Producto" />
-          <TableColumn fx:id="colCantidad" prefWidth="200.0" text="Cantidad" />
-          <TableColumn fx:id="colLote" prefWidth="200.0" text="Fecha Lote" />
-          <TableColumn fx:id="colVencimiento" prefWidth="200.0" text="Vencimiento" />
+          <TableColumn fx:id="colTipo" prefWidth="200.0" text="Tipo" />
+          <TableColumn fx:id="colMotivo" prefWidth="200.0" text="Motivo" />
+          <TableColumn fx:id="colMonto" prefWidth="200.0" text="Monto" />
+          <TableColumn fx:id="colFecha" prefWidth="200.0" text="Fecha" />
         </columns>
       </TableView>
 
