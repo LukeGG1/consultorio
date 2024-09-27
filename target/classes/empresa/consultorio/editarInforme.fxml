@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import com.jfoenix.controls.JFXButton?>
+<?import java.net.URL?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane id="AnchorPane" prefHeight="604.0" prefWidth="883.0" styleClass="mainFxmlClass" xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1" fx:controller="empresa.consultorio.EditarInformeController">
+    <stylesheets>
+        <URL value="@/empresa/consultorio/styles.css" />
+    </stylesheets>
+   <children>
+      <HBox layoutX="23.0" layoutY="7.0" prefHeight="37.0" prefWidth="883.0" styleClass="AnchorPane2" stylesheets="@stylePaciente.css" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+         <children>
+            <ImageView fitHeight="39.0" fitWidth="40.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@../../images/icons8-view-24.png" />
+               </image>
+               <HBox.margin>
+                  <Insets bottom="5.0" top="7.0" />
+               </HBox.margin>
+            </ImageView>
+            <Label prefHeight="38.0" prefWidth="129.0" text="Informes">
+               <font>
+                  <Font name="Georgia" size="26.0" />
+               </font>
+               <HBox.margin>
+                  <Insets left="10.0" top="7.0" />
+               </HBox.margin>
+            </Label>
+            <TextField fx:id="txtBuscar" prefHeight="31.0" prefWidth="278.0" promptText="🔍 Buscar Informe" style="-fx-border-color: black;">
+               <HBox.margin>
+                  <Insets left="10.0" top="7.0" />
+               </HBox.margin>
+               <font>
+                  <Font name="Arial" size="15.0" />
+               </font>
+            </TextField>
+            <JFXButton fx:id="btnAñadirInforme" onAction="#AñadirInforme" text="Informe">
+               <graphic>
+                  <ImageView fitHeight="14.0" fitWidth="19.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../../images/icons8-add-24%20(1).png" />
+                     </image>
+                  </ImageView>
+               </graphic>
+               <HBox.margin>
+                  <Insets left="10.0" top="10.0" />
+               </HBox.margin>
+               <font>
+                  <Font name="Arial Bold" size="13.0" />
+               </font>
+            </JFXButton>
+            <JFXButton fx:id="btnVerPacientes" layoutX="510.0" layoutY="21.0" onAction="#verPacientes" text="Ver Pacientes">
+               <graphic>
+                  <ImageView fitHeight="14.0" fitWidth="19.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../../images/icons8-sick-30.png" />
+                     </image>
+                  </ImageView>
+               </graphic>
+               <HBox.margin>
+                  <Insets left="10.0" top="10.0" />
+               </HBox.margin>
+               <font>
+                  <Font name="Arial Bold" size="13.0" />
+               </font>
+            </JFXButton>
+            <JFXButton fx:id="btnTratamiento" layoutX="618.0" layoutY="21.0" onAction="#VerTratamiento" text="Ver Tratamiento">
+               <graphic>
+                  <ImageView fitHeight="14.0" fitWidth="19.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../../images/icons8-treatment-50.png" />
+                     </image>
+                  </ImageView>
+               </graphic>
+               <HBox.margin>
+                  <Insets left="10.0" top="10.0" />
+               </HBox.margin>
+               <font>
+                  <Font name="Arial Bold" />
+               </font>
+            </JFXButton>
+            <JFXButton fx:id="imgCerrar" layoutX="291.0" layoutY="14.0" onAction="#handleCerrar" styleClass="image-container" stylesheets="@stylePaciente.css" text="" AnchorPane.rightAnchor="15.0" AnchorPane.topAnchor="12.0">
+               <graphic>
+                  <ImageView fitHeight="23.0" fitWidth="24.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../../images/icons8-multiplicar-30.png" />
+                     </image>
+                  </ImageView>
+               </graphic>
+               <HBox.margin>
+                  <Insets top="8.0" />
+               </HBox.margin></JFXButton>
+         </children>
+      </HBox>
+      <TableView fx:id="tblInforme" layoutX="46.0" layoutY="111.0" onMouseClicked="#modificarProducto" prefHeight="263.0" prefWidth="789.0" stylesheets="@stylePaciente.css">
+        <columns>
+          <TableColumn fx:id="colPaciente" prefWidth="200.0" text="Paciente" />
+          <TableColumn fx:id="colMotivoConsulta" prefWidth="200.0" text="Motivo Consulta" />
+            <TableColumn fx:id="colHallazgos" prefWidth="185.60001220703123" text="Hallazgos" />
+            <TableColumn fx:id="colFecha" prefWidth="200.0" text="Fecha" />
+        </columns>
+      </TableView>
+   </children>
+</AnchorPane>

@@ -1,17 +1,17 @@
 package empresa.consultorio;
 
+import clases.conexion;
+import com.jfoenix.controls.JFXButton;
 import java.net.URL;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.ResourceBundle;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.stream.Collectors;
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -22,10 +22,12 @@ import javafx.scene.control.Button;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
-import modelos.lote;
+import javafx.scene.image.ImageView;
+import javafx.stage.Stage;
+import modelos.Lote;
 import org.controlsfx.control.textfield.TextFields;
 
-public class LoteEditarController implements Initializable {
+public class LoteEditarController extends conexion implements Initializable {
 
     @FXML
     private Label labelId;
@@ -49,7 +51,9 @@ public class LoteEditarController implements Initializable {
     private ObservableList<String> productosList;
 
     
-    private lote l = new lote();
+    private Lote l = new Lote();
+    @FXML
+    private JFXButton imgCerrar;
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
@@ -58,7 +62,7 @@ public class LoteEditarController implements Initializable {
         configurarAutocompletado(txtNom, productosList);
     }
 
-    public void initData(int idLote, lote l) {
+    public void initData(int idLote, Lote l) {
         this.l = l;  // Store the lote instance
         labelId.setText("ID del Lote: " + idLote);
         txtNom.setText(l.getNombreProducto());
@@ -80,6 +84,7 @@ public class LoteEditarController implements Initializable {
 
         if (l.modificar()) {
             mostrarAlerta(Alert.AlertType.INFORMATION, "El sistema comunica:", "Modificado correctamente");
+            handleCerrar(null);
         } else {
             mostrarAlerta(Alert.AlertType.ERROR, "El sistema comunica:", "Registro no modificado.");
         }
@@ -89,6 +94,7 @@ public class LoteEditarController implements Initializable {
     private void eliminar(ActionEvent event) {
         if (l.eliminar()) {
             mostrarAlerta(Alert.AlertType.INFORMATION, "El sistema comunica:", "Eliminado correctamente");
+            handleCerrar(null);
         } else {
             mostrarAlerta(Alert.AlertType.ERROR, "El sistema comunica:", "Registro no eliminado.");
         }
@@ -105,7 +111,7 @@ public class LoteEditarController implements Initializable {
     String sql = "SELECT id_producto FROM producto WHERE nombre = ?";
     int idEncontrado = 0; // Variable para almacenar el ID encontrado
 
-    try (Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/consultorio", "root", "");
+    try (Connection con = getCon();
          PreparedStatement stm = con.prepareStatement(sql)) {
         
         stm.setString(1, nombreProducto);
@@ -134,7 +140,7 @@ public class LoteEditarController implements Initializable {
 }
     private void cargarNombresProductos(ObservableList<String> itemList) {
         String sql = "SELECT nombre FROM producto";
-        try (Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/consultorio", "root", "");
+        try (Connection con = getCon();
              PreparedStatement stm = con.prepareStatement(sql);
              ResultSet rs = stm.executeQuery()) {
 
@@ -144,5 +150,10 @@ public class LoteEditarController implements Initializable {
         } catch (SQLException ex) {
             ex.printStackTrace();
         }
+    }
+    @FXML
+    private void handleCerrar(ActionEvent event) {
+        Stage stage = (Stage) btnModificar.getScene().getWindow();
+        stage.close();
     }
 }

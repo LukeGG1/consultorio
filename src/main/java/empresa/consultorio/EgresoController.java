@@ -8,12 +8,13 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Alert;
-import javafx.scene.control.Alert.AlertType;
 import modelos.Movimiento;
-import java.sql.Timestamp;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
+import javafx.scene.control.Button;
+import javafx.scene.control.DatePicker;
+import javafx.stage.Stage;
 
 public class EgresoController {
 
@@ -27,12 +28,19 @@ public class EgresoController {
     private TextArea textDescripcion;
     
     @FXML
+    private DatePicker txtFechaMovimiento;
+    @FXML
+    private Button btnGuardar;
+    
+    @FXML
     private void initialize() {
-        // Inicializar el ComboBox con motivos de ingreso
+        // Inicializar el ComboBox con motivos de egreso
+        System.out.println("Initialize ejecutado");
         comboMotivo.setItems(FXCollections.observableArrayList("Servicio", "Lote", "Salario"));
     }
 
-    private void handleGuardar(ActionEvent event) {
+    @FXML
+    private void handleGuardar(ActionEvent event) throws SQLException {
         String tipo = "Egreso";
         String motivo = comboMotivo.getValue();
 
@@ -40,40 +48,47 @@ public class EgresoController {
         try {
             monto = Double.parseDouble(textMonto.getText());
         } catch (NumberFormatException e) {
-            mostrarAlerta("Error", "Monto inválido. Por favor, ingrese un número válido.");
+            mostrarAlerta(Alert.AlertType.ERROR, "El sistema comunica", "Monto inválido. Por favor, ingrese un número válido.");
             return;
         }
 
         String descripcion = textDescripcion.getText();
-        Date fecha = Date.valueOf(LocalDate.now()); // Verifica si esta fecha es válida para tu base de datos
+        LocalDate fechaLocal = txtFechaMovimiento.getValue();
+        if (fechaLocal == null) {
+            mostrarAlerta(Alert.AlertType.ERROR, "El sistema comunica", "Debe seleccionar una fecha.");
+            return;
+        }
+        Date fecha = Date.valueOf(fechaLocal); // Convertir LocalDate a java.sql.Date
 
         Movimiento nuevoMovimiento = new Movimiento(tipo, motivo, monto, descripcion, fecha);
 
-        try {
-            Movimiento.insertarMovimiento(nuevoMovimiento);
-            mostrarAlerta("Éxito", "Ingreso guardado exitosamente.");
-        } catch (SQLException e) {
-            mostrarAlerta("Error", "No se pudo guardar el ingreso: " + e.getMessage());
-            e.printStackTrace(); // Esto te dará más detalles del error
+        if (nuevoMovimiento.insertar()) {
+            mostrarAlerta(Alert.AlertType.INFORMATION, "El sistema comunica:", "Movimiento Modificado correctamente");
+            handleCerrar(null);
+        } else {
+            mostrarAlerta(Alert.AlertType.ERROR, "El sistema comunica:", "Movimiento no modificado.");
         }
 
-        limpiarCampos();
+        
     }
 
-
-    private void mostrarAlerta(String titulo, String contenido) {
-        Alert alert = new Alert(AlertType.INFORMATION);
-        alert.setTitle(titulo);
-        alert.setHeaderText(null);
-        alert.setContentText(contenido);
-        alert.showAndWait();
+     private void mostrarAlerta(Alert.AlertType tipo, String titulo, String contenido) {
+        Alert alerta = new Alert(tipo);
+        alerta.setTitle(titulo);
+        alerta.setHeaderText(null);
+        alerta.setContentText(contenido);
+        alerta.show();
     }
 
     private void limpiarCampos() {
         comboMotivo.setValue(null);
         textMonto.clear();
         textDescripcion.clear();
+        txtFechaMovimiento.setValue(null);
     }
-
-    
+    @FXML
+    private void handleCerrar(ActionEvent event) {
+        Stage stage = (Stage) btnGuardar.getScene().getWindow();
+        stage.close();
+    }
 }

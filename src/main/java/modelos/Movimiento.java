@@ -1,5 +1,6 @@
 package modelos;
 
+import clases.conexion;
 import java.sql.Connection;
 import java.sql.Date;
 import java.sql.DriverManager;
@@ -11,17 +12,14 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class Movimiento {
-    private static final String URL = "jdbc:mysql://localhost:3306/consultorio";
-    private static final String USER = "root";
-    private static final String PASSWORD = "";
+public class Movimiento extends conexion {
 
     private int id;
     private String tipo;
     private String motivo;
     private double monto;
     private String descripcion;
-    private Date fecha;
+    private Date fecha; // Cambiado a java.sql.Date
 
     // Constructor para insertar un nuevo movimiento
     public Movimiento(String tipo, String motivo, double monto, String descripcion, Date fecha) {
@@ -94,63 +92,73 @@ public class Movimiento {
         this.fecha = fecha;
     }
 
-    private Connection getCon() throws SQLException {
-        return DriverManager.getConnection(URL, USER, PASSWORD);
-    }
+    public boolean insertar() throws SQLException {
+        String sql = "INSERT INTO movimiento (tipo, motivo, monto, descripcion, fecha) VALUES (?, ?, ?, ?, ?)";
+        try (Connection con = getCon();
+             PreparedStatement stmt = con.prepareStatement(sql)) {
+            stmt.setString(1, getTipo());
+            stmt.setString(2, getMotivo());
+            stmt.setDouble(3, getMonto());
+            stmt.setString(4, getDescripcion());
+            stmt.setDate(5, getFecha()); // Cambiado a setDate
+            int rowsInserted = stmt.executeUpdate();
+            return rowsInserted > 0;
 
-    public static void insertarMovimiento(Movimiento movimiento) throws SQLException {
-        String sql = "INSERT INTO movimientos (tipo, motivo, monto, descripcion, fecha) VALUES (?, ?, ?, ?, ?)";
-        try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD);
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setString(1, movimiento.tipo);
-            stmt.setString(2, movimiento.motivo);
-            stmt.setDouble(3, movimiento.monto);
-            stmt.setString(4, movimiento.descripcion);
-            stmt.setDate(5, movimiento.fecha);
-            stmt.executeUpdate();
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+            return false; // Manejo de excepciones: retorno falso en caso de error
         }
     }
 
-    public static void editarMovimiento(Movimiento movimiento) {
-        String sql = "UPDATE movimientos SET tipo = ?, motivo = ?, monto = ?, descripcion = ?, fecha = ? WHERE id = ?";
-        try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD);
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.setString(1, movimiento.getTipo());
-            pstmt.setString(2, movimiento.getMotivo());
-            pstmt.setDouble(3, movimiento.getMonto());
-            pstmt.setString(4, movimiento.getDescripcion());
-            pstmt.setDate(5, movimiento.getFecha());
-            pstmt.setInt(6, movimiento.getId());
+    public boolean modificar() {
+        String sql = "UPDATE movimiento SET tipo = ?, motivo = ?, monto = ?, descripcion = ?, fecha = ? WHERE idMovimiento = ?";
+        try (Connection con = getCon();
+             PreparedStatement pstmt = con.prepareStatement(sql)) {
+            pstmt.setString(1, getTipo());
+            pstmt.setString(2, getMotivo());
+            pstmt.setDouble(3, getMonto());
+            pstmt.setString(4, getDescripcion());
+            pstmt.setDate(5, getFecha());
+            pstmt.setInt(6, getId());
             pstmt.executeUpdate();
+            
+            int filasAfectadas = pstmt.executeUpdate();
+            return filasAfectadas > 0;
         } catch (SQLException e) {
             e.printStackTrace();
+            return false;
         }
     }
 
-    public static void eliminarMovimiento(int id) {
-        String sql = "DELETE FROM movimientos WHERE id = ?";
-        try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD);
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.setInt(1, id);
-            pstmt.executeUpdate();
+    public boolean eliminar() {
+        String sql = "DELETE FROM movimiento WHERE idMovimiento = ?";
+        try (Connection con = getCon();
+             PreparedStatement pstmt = con.prepareStatement(sql)) {
+            pstmt.setInt(1, getId());
+            
+            int filasAfectadas = pstmt.executeUpdate();
+
+                return filasAfectadas > 0;
+                
         } catch (SQLException e) {
             e.printStackTrace();
+            return false;
         }
     }
 
     public List<Movimiento> consulta() {
         List<Movimiento> listaMovimiento = new ArrayList<>();
-        String sql = "SELECT * FROM movimientos";
-        try (Connection con = DriverManager.getConnection(URL, USER, PASSWORD);
+        String sql = "SELECT * FROM movimiento";
+        try (Connection con = getCon();
              PreparedStatement stm = con.prepareStatement(sql);
              ResultSet rs = stm.executeQuery()) {
             while (rs.next()) {
-                int id = rs.getInt("id");
+                int id = rs.getInt("idMovimiento");
                 String tipo = rs.getString("tipo");
                 String motivo = rs.getString("motivo");
                 double monto = rs.getDouble("monto");
                 String descripcion = rs.getString("descripcion");
-                Date fecha = rs.getDate("fecha");
+                Date fecha = rs.getDate("fecha"); // Cambiado a getDate
                 Movimiento m = new Movimiento(id, tipo, motivo, monto, descripcion, fecha);
                 listaMovimiento.add(m);
             }

@@ -1,0 +1,14 @@
+.AnchorPaneUno{
+    -fx-background-image:url("/images/imagen1.jpg");
+    -fx-background-repeat: no-repeat;
+    -fx-background-size: cover;
+}
+
+
+
+
+.vboxRight{
+    -fx-background-image:url("/images/rigthimage.jpg");
+    -fx-background-repeat: no-repeat;
+    -fx-background-size: cover;
+}

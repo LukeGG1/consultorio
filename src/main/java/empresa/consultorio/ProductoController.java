@@ -4,7 +4,7 @@
  */
 package empresa.consultorio;
 
-import modelos.producto;
+import modelos.Producto;
 import com.jfoenix.controls.JFXButton;
 import java.io.File;
 import java.io.IOException;
@@ -12,6 +12,7 @@ import java.net.URL;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javafx.application.Platform;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -27,21 +28,17 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
-import modelos.lote;
+import modelos.Lote;
 
 /**
  * FXML Controller class
  *
  * @author Milagros Taboada
  */
-public class ProductoController implements Initializable {
+public class ProductoController {
 
     @FXML
     private JFXButton btnLote;
-    @FXML
-    private Button btnImagen;
-    @FXML
-    private ImageView imgProducto;
     @FXML
     private Button btnProducto;
     @FXML
@@ -50,32 +47,25 @@ public class ProductoController implements Initializable {
     private TextField txtPrecio;
     @FXML
     private TextArea txtDescripcion;
-    
+
     private final FileChooser fc = new FileChooser();
-    
-    producto p = new producto();
-    ObservableList<producto> registros;
-    ObservableList<producto> registrosFiltrados;
+
+    Producto p = new Producto();
+    ObservableList<Producto> registros;
+    ObservableList<Producto> registrosFiltrados;
     boolean modificar = false;
+    @FXML
+    private JFXButton imgCerrar;
 
     /**
      * Initializes the controller class.
      */
-    @Override
-    public void initialize(URL url, ResourceBundle rb) {
-        
-        fc.setInitialDirectory(new File(System.getProperty("user.home")));
-        fc.getExtensionFilters().addAll(
-            new FileChooser.ExtensionFilter("Archivos de imagen", "*.png", "*.jpg", "*.gif")
-        );
-        // TODO
-    }    
-
     @FXML
     private void añadirLote(ActionEvent event) {
-        abrirFxml("lote.fxml","Formulario Cliente");
+        abrirFxml("lote.fxml", "Formulario Cliente");
+        btnLote.getScene().getWindow().hide();
     }
-    
+
     private void abrirFxml(String fxml, String titulo) {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource(fxml));
@@ -87,23 +77,7 @@ public class ProductoController implements Initializable {
         } catch (IOException ex) {
             Logger.getLogger(ProductoController.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
-    }
 
-    @FXML
-    private void añadirImagen(ActionEvent event) {
-        File file = fc.showOpenDialog(null);
-        if (file != null) {
-            try {
-                Image image = new Image(file.toURI().toURL().toExternalForm());
-                imgProducto.setImage(image);
-            } catch (Exception e) {
-                System.out.println("Error al cargar la imagen: " + e.getMessage());
-                e.printStackTrace();  // Imprime el rastreo de la pila para ver el origen del error
-            }
-        } else {
-            System.out.println("No se seleccionó ningún archivo");
-        }
     }
 
     @FXML
@@ -111,19 +85,21 @@ public class ProductoController implements Initializable {
         String nombre = txtNombre.getText();
         int precio = Integer.parseInt(txtPrecio.getText());
         String descripcion = txtDescripcion.getText();
-        
+
         p.setNombre(nombre);
         p.setPrecio(precio);
         p.setDescripcion(descripcion);
-        
-        if(modificar){
-            if(p.modificar()){
+
+        if (modificar) {
+            if (p.modificar()) {
                 Alert alerta = new Alert(Alert.AlertType.INFORMATION);
                 alerta.setTitle("El sistema comunica:");
                 alerta.setHeaderText(null);
                 alerta.setContentText("Modificado correctamente");
                 alerta.show();
-            }else {
+                handleCerrar(null);
+
+            } else {
                 Alert alerta = new Alert(Alert.AlertType.ERROR);
                 alerta.setTitle("El sistema comunica:");
                 alerta.setHeaderText(null);
@@ -131,23 +107,31 @@ public class ProductoController implements Initializable {
                 alerta.show();
             }
             modificar = false;
-            
-        }else{
+
+        } else {
             if (p.insertar()) {
-            Alert alerta = new Alert(Alert.AlertType.CONFIRMATION);
-            alerta.setTitle("El sistema comunica:");
-            alerta.setHeaderText(null);
-            alerta.setContentText("Insertado correctamente");
-            alerta.show();
-            }else{
-            Alert alerta = new Alert(Alert.AlertType.ERROR);
-            alerta.setTitle("Els sistema comunica:");
-            alerta.setHeaderText(null);
-            alerta.setContentText("No se pudo insertar");
-            alerta.show();
-            
-        }
+                Alert alerta = new Alert(Alert.AlertType.CONFIRMATION);
+                alerta.setTitle("El sistema comunica:");
+                alerta.setHeaderText(null);
+                alerta.setContentText("Insertado correctamente");
+                alerta.show();
+                handleCerrar(null);
+            } else {
+                Alert alerta = new Alert(Alert.AlertType.ERROR);
+                alerta.setTitle("Els sistema comunica:");
+                alerta.setHeaderText(null);
+                alerta.setContentText("No se pudo insertar");
+                alerta.show();
+                
+
+            }
+
         }
     }
-    
+
+    @FXML
+    private void handleCerrar(ActionEvent event) {
+        Stage stage = (Stage) btnProducto.getScene().getWindow();
+        stage.close();
+    }
 }

@@ -10,7 +10,7 @@ public class DatabaseConnection {
         try {
             String url = "jdbc:mysql://localhost:3306/consultorio";
             String user = "root";
-            String password = ""; // Reemplaza con tu contraseña
+            String password = "andrea123"; // Reemplaza con tu contraseña
             Connection conn = DriverManager.getConnection(url, user, password);
             return conn;
         } catch (Exception e) {

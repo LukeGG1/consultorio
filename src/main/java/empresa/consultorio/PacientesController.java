@@ -1,22 +1,36 @@
 package empresa.consultorio;
 
+import clases.conexion;
+import com.jfoenix.controls.JFXButton;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.DatePicker;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import javafx.stage.Stage; // Importar la clase Stage
 import org.controlsfx.control.textfield.TextFields;
+import modelos.Paciente;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.time.LocalDate;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
+import javafx.application.Platform;
+import javafx.event.ActionEvent;
+import javafx.geometry.Insets;
+import javafx.scene.image.ImageView;
+import javafx.stage.Stage;
 
-public class PacientesController {
+public class PacientesController extends conexion {
 
     @FXML
     private TextField nombreTextField;
@@ -28,20 +42,18 @@ public class PacientesController {
     private ComboBox<String> sexoComboBox;
 
     @FXML
-    private TextField edadTextField;
+    private DatePicker txtFechaNac;
 
     @FXML
     private TextField correoTextField;
 
     @FXML
     private TextField telefonoTextField;
-
     @FXML
     private VBox alergiaContainer;
 
     @FXML
     private TextField alergiaTextField;
-
     @FXML
     private VBox cirugiaContainer;
 
@@ -51,169 +63,275 @@ public class PacientesController {
     private ObservableList<String> alergiaList;
     private ObservableList<String> cirugiaList;
 
-    // Referencia al escenario principal
-    private Stage stage;
-
-    // Método para establecer el escenario
-    public void setStage(Stage stage) {
-        this.stage = stage;
-    }
-
     @FXML
+    private Button btnGuardar;
+    @FXML
+    private Button btnEliminar;
+
+    private Paciente p = new Paciente();
+    private Boolean modificarP = false;
+    @FXML
+    private JFXButton imgCerrar;
+
     public void initialize() {
         alergiaList = FXCollections.observableArrayList();
         cirugiaList = FXCollections.observableArrayList();
-        sexoComboBox.setItems(FXCollections.observableArrayList("Masculino", "Femenino", "Otro"));
+        sexoComboBox.setItems(FXCollections.observableArrayList("Masculino", "Femenino"));
         cargarAlergias();
         cargarCirugias();
         configurarAutocompletado(alergiaTextField, alergiaList);
         configurarAutocompletado(cirugiaTextField, cirugiaList);
     }
 
+    public void initData(Paciente pacienteSeleccionado) {
+        modificarP = true;
+        p = pacienteSeleccionado;
+        nombreTextField.setText(p.getNombre());
+        apellidoTextField.setText(p.getApellido());
+        sexoComboBox.setValue(p.getSexo());
+        txtFechaNac.setValue(LocalDate.parse(p.getFechaNac()));
+        correoTextField.setText(p.getCorreo());
+        telefonoTextField.setText(String.valueOf(p.getTelefono()));
+        btnGuardar.setText("Modificar");
+        btnGuardar.setOnAction(e -> {
+            try {
+                modificarPaciente();
+            } catch (SQLException ex) {
+                Logger.getLogger(PacientesController.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        });
+        btnEliminar.setVisible(true);
+
+        // Cargar alergias del paciente
+        p.getAlergias().forEach(this::agregarAlergia);
+
+        // Cargar cirugías del paciente
+        p.getCirugias().forEach(this::agregarCirugia);
+    }
+
     @FXML
     private void agregarOtraAlergia() {
-        agregarOtroItem(alergiaContainer, alergiaList, "Ingrese otra alergia");
+        agregarAlergia("");
     }
 
     @FXML
     private void agregarOtraCirugia() {
-        agregarOtroItem(cirugiaContainer, cirugiaList, "Ingrese otra cirugía");
+        agregarCirugia("");
+    }
+
+    private void agregarAlergia(String alergia) {
+        HBox hbox = new HBox();
+        TextField textField = new TextField(alergia);
+        textField.setPromptText("Ingrese otra alergia");
+        textField.setStyle("-fx-background-color: transparent;\n"
+                + "    -fx-border-width: 0px 0px 0.5px 0px; \n"
+                + "    -fx-border-color: black;\n"
+                + "    -fx-background-insets: 0, 0 0 1 0;\n"
+                + "    -fx-focus-color: #0078d7;\n"
+                + "     -fx-text-fill: black;\n"
+                + "     -fx-prompt-text-fill: #A9A9A9; \n"
+                + "     -fx-font-family: \"Georgia\";"
+        );
+        hbox.setMargin(textField, new Insets(10, 0, 0, 100));
+        Button button = new Button("-");
+        button.setStyle("-fx-background-color: linear-gradient(to bottom right,#EEF7FF, #EEF7FF);\n"
+                + "    -fx-background-radius: 50;\n"
+                + "    -fx-font-family: \"Georgia\"; ");
+        hbox.setMargin(button, new Insets(10, 0, 0, 15));
+        button.setOnAction(e -> alergiaContainer.getChildren().remove(hbox));
+        hbox.getChildren().addAll(textField, button);
+        alergiaContainer.getChildren().add(hbox);
+    }
+
+    private void agregarCirugia(String cirugia) {
+        HBox hbox = new HBox();
+        TextField textField = new TextField(cirugia);
+        textField.setPromptText("Ingrese otra cirugía");
+        textField.setStyle("-fx-background-color: transparent;\n"
+                + "    -fx-border-width: 0px 0px 0.5px 0px; \n"
+                + "    -fx-border-color: black;\n"
+                + "    -fx-background-insets: 0, 0 0 1 0;\n"
+                + "    -fx-focus-color: #0078d7;\n"
+                + "     -fx-text-fill: black;\n"
+                + "     -fx-prompt-text-fill: #A9A9A9; \n"
+                + "     -fx-font-family: \"Georgia\";"
+        );
+        hbox.setMargin(textField, new Insets(10, 0, 0, 100));
+        Button button = new Button("-");
+        button.setStyle("-fx-background-color: linear-gradient(to bottom right,#EEF7FF, #EEF7FF);\n"
+                + "    -fx-background-radius: 50;\n"
+                + "    -fx-font-family: \"Georgia\"; ");
+        hbox.setMargin(button, new Insets(10, 0, 0, 15));
+        button.setOnAction(e -> cirugiaContainer.getChildren().remove(hbox));
+        hbox.getChildren().addAll(textField, button);
+        cirugiaContainer.getChildren().add(hbox);
     }
 
     @FXML
-    public void guardarPaciente() {
+    public void guardarPaciente() throws SQLException {
         String nombre = nombreTextField.getText().trim();
         String apellido = apellidoTextField.getText().trim();
         String sexo = sexoComboBox.getValue();
-        int edad;
-        try {
-            edad = Integer.parseInt(edadTextField.getText().trim());
-        } catch (NumberFormatException e) {
-            mostrarMensaje("Error de Formato", "La edad debe ser un número.", Alert.AlertType.ERROR);
-            return;
-        }
+        String fechaNac = txtFechaNac.getValue().toString();
         String correo = correoTextField.getText().trim();
         String telefono = telefonoTextField.getText().trim();
 
-        String insertPacienteSql = "INSERT INTO paciente (nombre, apellido, sexo, edad, correo, telefono) VALUES (?, ?, ?, ?, ?, ?)";
-        try (Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/consultorio", "root", "");
-             PreparedStatement stm = con.prepareStatement(insertPacienteSql, Statement.RETURN_GENERATED_KEYS)) {
+        p.setNombre(nombre);
+        p.setApellido(apellido);
+        p.setSexo(sexo);
+        p.setFechaNac(fechaNac);
+        p.setCorreo(correo);
+        p.setTelefono(telefono);
 
-            stm.setString(1, nombre);
-            stm.setString(2, apellido);
-            stm.setString(3, sexo);
-            stm.setInt(4, edad);
-            stm.setString(5, correo);
-            stm.setString(6, telefono);
-            stm.executeUpdate();
-
-            int idPaciente;
-            try (ResultSet generatedKeys = stm.getGeneratedKeys()) {
-                if (generatedKeys.next()) {
-                    idPaciente = generatedKeys.getInt(1);
-                    guardarItemsPaciente(idPaciente, alergiaContainer, "paciente_has_alergia", "alergia");
-                    guardarItemsPaciente(idPaciente, cirugiaContainer, "paciente_has_cirugia", "cirugia");
-
-                    // Cerrar la ventana
-                    stage.close();
-                } else {
-                    throw new SQLException("No se pudo obtener el ID del paciente insertado.");
-                }
-            }
-
-            limpiarCampos();
-            mostrarMensaje("Paciente Guardado", "El paciente ha sido guardado exitosamente.", Alert.AlertType.INFORMATION);
-
-        } catch (SQLException ex) {
-            ex.printStackTrace();
-            mostrarMensaje("Error al Guardar Paciente", "Hubo un error al intentar guardar al paciente. Por favor, inténtelo de nuevo.", Alert.AlertType.ERROR);
-        }
-    }
-
-    private void guardarItemsPaciente(int idPaciente, VBox container, String tableName, String itemName) {
-        String insertItemSql = "INSERT INTO " + tableName + " (paciente_id_paciente, " + itemName + "id" + itemName + ") VALUES (?, (SELECT id_" + itemName + " FROM " + itemName + " WHERE nombre = ?))";
-        for (javafx.scene.Node node : container.getChildren()) {
-            if (node instanceof HBox) {
-                HBox hbox = (HBox) node;
-                TextField textField = (TextField) hbox.getChildren().get(0); // Assuming TextField is always the first child
-                String nombreItem = textField.getText().trim();
-                if (!nombreItem.isEmpty()) {
-                    try (Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/consultorio", "root", "");
-                         PreparedStatement stm = con.prepareStatement(insertItemSql)) {
-
-                        stm.setInt(1, idPaciente);
-                        stm.setString(2, nombreItem);
-                        stm.executeUpdate();
-
-                    } catch (SQLException ex) {
-                        ex.printStackTrace();
+        if (p.createPaciente()) {
+            for (javafx.scene.Node node : alergiaContainer.getChildren()) {
+                if (node instanceof HBox) {
+                    HBox hbox = (HBox) node;
+                    TextField textField = (TextField) hbox.getChildren().get(0);
+                    String nombreAlergia = textField.getText().trim();
+                    if (!nombreAlergia.isEmpty()) {
+                        p.verificarOAlergia(nombreAlergia);
+                        p.agregarAlergiaAPaciente(nombreAlergia);
                     }
                 }
             }
+
+            for (javafx.scene.Node node : cirugiaContainer.getChildren()) {
+                if (node instanceof HBox) {
+                    HBox hbox = (HBox) node;
+                    TextField textField = (TextField) hbox.getChildren().get(0);
+                    String nombreCirugia = textField.getText().trim();
+                    if (!nombreCirugia.isEmpty()) {
+                        p.verificarOCirugia(nombreCirugia);
+                        p.agregarCirugiaAPaciente(nombreCirugia);
+                    }
+                }
+            }
+
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("Éxito");
+            alert.setHeaderText(null);
+            alert.setContentText("Paciente guardado exitosamente.");
+            alert.showAndWait();
+            handleCerrar(null);
+
+        } else {
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Error");
+            alert.setHeaderText(null);
+            alert.setContentText("No se pudo guardar el paciente.");
+            alert.showAndWait();
         }
     }
 
-    private void agregarOtroItem(VBox container, ObservableList<String> itemList, String promptText) {
+    private void agregarOtroItem(VBox container, ObservableList<String> list, String promptText) {
         HBox hbox = new HBox();
-        TextField nuevaTextField = new TextField();
-        nuevaTextField.setPromptText(promptText);
-        Button removeButton = new Button("-");
-        removeButton.setOnAction(e -> container.getChildren().remove(hbox));
-        hbox.getChildren().addAll(nuevaTextField, removeButton);
-        configurarAutocompletado(nuevaTextField, itemList);
+        TextField textField = new TextField();
+        textField.setPromptText(promptText);
+        list.add(textField.getText());
+        Button button = new Button("-");
+        button.setOnAction(e -> container.getChildren().remove(hbox));
+        hbox.getChildren().addAll(textField, button);
         container.getChildren().add(hbox);
     }
 
     private void cargarAlergias() {
-        cargarItems("alergia", alergiaList);
-    }
-
-    private void cargarCirugias() {
-        cargarItems("cirugia", cirugiaList);
-    }
-
-    private void cargarItems(String itemName, ObservableList<String> itemList) {
-        String sql = "SELECT nombre FROM " + itemName;
-        try (Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/consultorio", "root", "");
-             PreparedStatement stm = con.prepareStatement(sql);
-             ResultSet rs = stm.executeQuery()) {
-
+        try (Connection con = getCon()) {
+            String sql = "SELECT nombre FROM alergia";
+            ResultSet rs = con.createStatement().executeQuery(sql);
             while (rs.next()) {
-                itemList.add(rs.getString("nombre"));
+                alergiaList.add(rs.getString("nombre"));
             }
-        } catch (SQLException ex) {
-            ex.printStackTrace();
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
     }
 
-    private void configurarAutocompletado(TextField textField, ObservableList<String> itemList) {
-    TextFields.bindAutoCompletion(textField, param -> {
-        List<String> filteredList = itemList.stream()
-                .filter(item -> item.toLowerCase().contains(param.getUserText().toLowerCase()))
-                .limit(3) // Limitar a 3 resultados
-                .collect(Collectors.toList());
-        return filteredList;
-    });
-}
-
-    private void limpiarCampos() {
-        nombreTextField.clear();
-        apellidoTextField.clear();
-        sexoComboBox.getSelectionModel().clearSelection();
-        edadTextField.clear();
-        correoTextField.clear();
-        telefonoTextField.clear();
-        alergiaContainer.getChildren().clear();
-        cirugiaContainer.getChildren().clear();
-        agregarOtraAlergia();
-        agregarOtraCirugia();
+    private void cargarCirugias() {
+        try (Connection con = getCon()) {
+            String sql = "SELECT nombre FROM cirugia";
+            ResultSet rs = con.createStatement().executeQuery(sql);
+            while (rs.next()) {
+                cirugiaList.add(rs.getString("nombre"));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
-    private void mostrarMensaje(String titulo, String mensaje, Alert.AlertType tipoAlerta) {
-        Alert alerta = new Alert(tipoAlerta);
-        alerta.setTitle(titulo);
-        alerta.setHeaderText(null);
-        alerta.setContentText(mensaje);
-        alerta.showAndWait();
+    private void configurarAutocompletado(TextField textField, List<String> items) {
+        TextFields.bindAutoCompletion(textField, items);
+        textField.textProperty().addListener((observable, oldValue, newValue) -> {
+            if (!newValue.isEmpty() && !items.contains(newValue)) {
+                items.add(newValue);
+            }
+        });
+    }
+
+    public void modificarPaciente() throws SQLException {
+        String nombre = nombreTextField.getText().trim();
+        String apellido = apellidoTextField.getText().trim();
+        String sexo = sexoComboBox.getValue();
+        String fechaNac = txtFechaNac.getValue().toString();
+        String correo = correoTextField.getText().trim();
+        String telefono = telefonoTextField.getText().trim();
+
+        List<String> nuevasAlergias = alergiaContainer.getChildren().stream()
+                .filter(node -> node instanceof HBox)
+                .map(node -> ((HBox) node).getChildren().get(0))
+                .filter(TextField.class::isInstance)
+                .map(TextField.class::cast)
+                .map(TextField::getText)
+                .filter(text -> !text.trim().isEmpty())
+                .collect(Collectors.toList());
+
+        List<String> nuevasCirugias = cirugiaContainer.getChildren().stream()
+                .filter(node -> node instanceof HBox)
+                .map(node -> ((HBox) node).getChildren().get(0))
+                .filter(TextField.class::isInstance)
+                .map(TextField.class::cast)
+                .map(TextField::getText)
+                .filter(text -> !text.trim().isEmpty())
+                .collect(Collectors.toList());
+
+        if (p.modificarPaciente(nombre, apellido, sexo, fechaNac, correo, telefono, nuevasAlergias, nuevasCirugias)) {
+
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("Éxito");
+            alert.setHeaderText(null);
+            alert.setContentText("Paciente guardado exitosamente.");
+            alert.showAndWait();
+            handleCerrar(null);
+        } else {
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Error");
+            alert.setHeaderText(null);
+            alert.setContentText("No se pudo guardar el paciente.");
+            alert.showAndWait();
+        }
+    }
+
+    @FXML
+    public void eliminarPaciente() {
+        if (p != null && p.eliminarPaciente()) {
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("Éxito");
+            alert.setHeaderText(null);
+            alert.setContentText("Paciente eliminado exitosamente.");
+            alert.showAndWait();
+            handleCerrar(null);
+        } else {
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Error");
+            alert.setHeaderText(null);
+            alert.setContentText("No se pudo eliminar el paciente.");
+            alert.showAndWait();
+        }
+    }
+
+    @FXML
+    private void handleCerrar(ActionEvent event) {
+        Stage stage = (Stage) btnGuardar.getScene().getWindow();
+        stage.close();
     }
 }

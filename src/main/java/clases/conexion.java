@@ -66,7 +66,7 @@ public class conexion {
         this.base = "consultorio";
         this.host = "localhost";
         this.usuario = "root";
-        this.contra = "";
+        this.contra = "andrea123";
     }
 
     public Connection getCon() {
